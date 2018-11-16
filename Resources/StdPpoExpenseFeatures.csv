@@ -1,19 +1,28 @@
 ﻿; name of field, value
-NameOfPlan,Standard PPO
+NameOfPlan,Std	; Standard PPO
 DeductiblePerPerson,250
 DeductiblePerFamily,500
 MaxOutOfPocketPerPerson,2500
 MaxOutOfPocketPerFamily,5000
 
 ; code, description, default price, copay $, co-insurance %
-OV,Office Visit, 85, 20, 
-SV, Specialist Visit, 150, 30, 
-LabXUS, Lab, X-ray or Ultrasound, 200, 0, 
-IS, Inpatient Surgery, 50000, , 10%
-OS, Outpatient Surgery, 5000, , 10%
-ER, Emergency Room, 750, 100, 
-AM, Ambulance, 200, , 10%
-RX-MO, Generic Rx 1 month, 30, 10,
-BRAND-MO, Brand name Rx 1 month, 100, 30
-NONPREF-MO, Non-preferred Rx 1 month, 200, 50,
-SPEC-MO, Specialty Rx, 1000, 30,
+OV,Office Visit, 85, 20
+SV, Specialist Visit, 150, 30
+LAB, Labs / "Diagnostic Tests", 100, 0 ; Does NOT include X-rays or imaging
+XRAY, X-ray, 300, 0
+ULTRA, Ultrasound, 300, 0
+MRI, MRI / CT / PET, 1000, , 10%
+URGENT, Urgent care, 200, , 10%
+ER, Emergency Room, 750, 100
+AMB, Ambulance, 200, , 10%
+SURGERY-IN, Inpatient Surgery, 50000, , 10%
+SURGERY-OUT, Outpatient Surgery, 5000, , 10%
+RX-GEN-1MO, Generic Rx 1 month, 30, 10
+RX-GEN-3MO, Generic Rx 3 month, 30, 20
+RX-PREF-1MO, Pref brand name Rx 1 month, 100, 30
+RX-PREF-3MO, Pref brand name Rx 3 month, 100, 60
+RX-NONPREF-1MO, Non-pref brand Rx 1 month, 200, 50
+RX-NONPREF-3MO, Non-pref brand Rx 1 month, 200, 100
+RX-SPEC-1MO, Specialty Rx 1 month only, 1000, 99 ; "Cost Varies"
+PT, Physical Therapy, 50, 25
+EQUIP, Medical equipment, 500, , 10%

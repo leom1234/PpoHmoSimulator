@@ -47,7 +47,7 @@ namespace PPOSimulator
             }
         }
 
-        public void SimulateEvent(TrialEvent trialEvent)
+        public void SimulateEvent(TrialEvent trialEvent, out int serviceCostDollars)
         {
             if (PlanFeatures.ExpenseFeaturesDict.ContainsKey(trialEvent.Code) == false)
             {
@@ -55,17 +55,17 @@ namespace PPOSimulator
             }
 
             var expenseFeatures = PlanFeatures.ExpenseFeaturesDict[trialEvent.Code];
-            int cost = expenseFeatures.DefaultServiceCostDollars;
+            serviceCostDollars = expenseFeatures.DefaultServiceCostDollars;
             if (trialEvent.ServiceCostDollars.HasValue)
             {
-                cost = trialEvent.ServiceCostDollars.Value;
+                serviceCostDollars = trialEvent.ServiceCostDollars.Value;
             }
 
             float copayOrCoinsuranceDollars = (float)(expenseFeatures.IsCopay
                 ? expenseFeatures.CopayDollars
-                : cost * expenseFeatures.CoinsurancePercent / 100f);
+                : serviceCostDollars * expenseFeatures.CoinsurancePercent / 100f);
 
-            ProcessStdPPOExpense(trialEvent.Code, trialEvent.Person, expenseFeatures.IsCopay, cost, copayOrCoinsuranceDollars);
+            ProcessStdPPOExpense(trialEvent.Code, trialEvent.Person, expenseFeatures.IsCopay, serviceCostDollars, copayOrCoinsuranceDollars);
 
         }
 

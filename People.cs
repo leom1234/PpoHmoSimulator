@@ -24,7 +24,7 @@ namespace PPOSimulator
                     var trimmedName = name.Trim();
                     if (trimmedName.Length >= 0)
                     {
-                        Names.Add(trimmedName);
+                        Names.Add(trimmedName.ToLower());
                     }
                 }
 

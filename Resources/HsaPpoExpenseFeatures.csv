@@ -1,1 +1,29 @@
-﻿
+﻿; name of field, value
+NameOfPlan,HSA	; HSA High-Deductible PPO
+DeductiblePerPerson,2700
+DeductiblePerFamily,2700
+MaxOutOfPocketPerPerson,4000
+MaxOutOfPocketPerFamily,6550
+
+; code, description, default price, copay $, co-insurance %
+OV,Office Visit, 85, 20
+SV, Specialist Visit, 150, 30
+LAB, Labs / "Diagnostic Tests", 100, , 10% ; Does NOT include X-rays or imaging
+XRAY, X-ray, 300, , 10%
+ULTRA, Ultrasound, 300, , 10%
+MRI, MRI / CT / PET, 1000, , 10%
+URGENT, Urgent care, 200, , 10%
+ER, Emergency Room, 750, , 10%
+AMB, Ambulance, 200, , 10%
+SURGERY-IN, Inpatient Surgery, 50000, , 10%
+SURGERY-OUT, Outpatient Surgery, 5000, , 10%
+RX-GEN-1MO, Generic Rx 1 month, 30, 5
+RX-GEN-3MO, Generic Rx 3 month, 30, 10
+RX-PREF-1MO, Pref brand name Rx 1 month, 100, 20
+RX-PREF-3MO, Pref brand name Rx 3 month, 100, 40
+RX-NONPREF-1MO, Non-pref brand Rx 1 month, 200, 40
+RX-NONPREF-3MO, Non-pref brand Rx 1 month, 200, 80
+RX-SPEC-1MO, Specialty Rx 1 month only, 1000, 99 ; "Cost Varies"
+PT, Physical Therapy, 50, , 10%
+EQUIP, Medical equipment, 500, , 10%
+

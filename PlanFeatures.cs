@@ -6,7 +6,8 @@ namespace PPOSimulator
 {
     public class PlanFeatures
     {
-        private const int NumFields = 5; // code, description, default price, copay, co-insurance
+        private const int MinNumFields = 4; // code, description, default price, copay
+        private const int MaxNumFields = 5; // code, description, default price, copay, co-insurance% (must end with "%")
 
         public string PlanFeaturesCsvPath { get; }
         public string NameOfPlan { get; }
@@ -26,13 +27,15 @@ namespace PPOSimulator
             int? deductiblePerFamily = null;
             int? maxPerPerson = null;
             int? maxPerFamily = null;
-            
-            Dictionary<string, PlanFeaturesFields> featuresSet = new Dictionary<string, PlanFeaturesFields>();
+
+            ExpenseFeaturesDict = new Dictionary<string, PlanFeaturesFields>();
             char[] delims = {','};
             var lines = File.ReadAllLines(planFeaturesCsvPath);
-            int lineNumber = 1;
+            int lineNumber = 0;
             foreach (var line in lines)
             {
+                lineNumber++;
+
                 const string CommentPrefix = ";";
                 int commentIndex = line.IndexOf(CommentPrefix);
 
@@ -47,8 +50,8 @@ namespace PPOSimulator
                 {
                     try
                     {
-                        var key = fields[0].ToLower();
-                        var val = fields[1];
+                        var key = fields[0].Trim().ToLower(); // TODO: refactor out Trim()
+                        var val = fields[1].Trim();
                         switch (key)
                         {
                             case "nameofplan":
@@ -74,17 +77,30 @@ namespace PPOSimulator
                     catch (Exception e)
                     {
                         throw new ApplicationException(
-                            $"Line {lineNumber} of {planFeaturesCsvPath} has an invalid integer field (field 3 and field 4 or 5 must be integer)");
+                            $"Line {lineNumber} ('{line}') of {planFeaturesCsvPath} has an invalid integer field (field 3 and field 4 or 5 must be integer)");
                     }
                 }
-                else if (fields.Length == NumFields)
+                else if (fields.Length == MinNumFields || fields.Length == MaxNumFields)
                 {
                     int i = 0;
-                    string code = fields[i++];
-                    string description = fields[i++];
-                    string defaultServiceCostStr = fields[i++];
-                    string copayDollarsStr = fields[i++];
-                    string coinsurancePercentStr = fields[i++];
+                    string code = fields[i++].Trim().ToUpper();
+                    string description = fields[i++].Trim();
+                    string defaultServiceCostStr = fields[i++].Trim();
+                    string copayDollarsStr = fields[i++].Trim();
+
+                    string coinsurancePercentStr = "";
+
+                    if (fields.Length == MaxNumFields)
+                    {
+                        coinsurancePercentStr = fields[i++].Trim();
+                        if (!coinsurancePercentStr.EndsWith("%"))
+                        {
+                            throw new ApplicationException(
+                                $"Line {lineNumber} ('{line}') of {planFeaturesCsvPath} field 5 (co-insurance) must end with '%'. If item is a copay instead, omit entire field 5");
+                        }
+
+                        coinsurancePercentStr = coinsurancePercentStr.Substring(0, coinsurancePercentStr.Length - 1);
+                    }
 
                     int defaultServiceCost;
                     int? copayDollars = null;
@@ -106,19 +122,19 @@ namespace PPOSimulator
                     catch (Exception e)
                     {
                         throw new ApplicationException(
-                            $"Line {lineNumber} of {planFeaturesCsvPath} has an invalid integer field (field 3 and field 4 or 5 must be integer)");
+                            $"Line {lineNumber} ('{line}') of {planFeaturesCsvPath} has an invalid integer field (field 3 and field 4 or 5 must be integer)");
                     }
 
                     try
                     {
                         var features = new PlanFeaturesFields(code.ToUpper(), description, defaultServiceCost,
                             copayDollars, coinsurancePercent);
-                        featuresSet.Add(code, features);
+                        ExpenseFeaturesDict.Add(code, features);
                     }
                     catch (Exception e)
                     {
                         throw new ApplicationException(
-                            $"Line {lineNumber} of {planFeaturesCsvPath} is invalid: {e.Message}");
+                            $"Line {lineNumber} ('{line}') of {planFeaturesCsvPath} is invalid: {e.Message}");
                     }
 
                     if (NameOfPlan.Length == 0)
@@ -144,7 +160,7 @@ namespace PPOSimulator
                 else
                 {
                     throw new ApplicationException(
-                        $"Line {lineNumber} of {planFeaturesCsvPath} ('{line}') has {fields.Length} fields, must be 2 or {NumFields} fields on each trimmedLine");
+                        $"Line {lineNumber} of {planFeaturesCsvPath} ('{line}') has {fields.Length} fields, must be 2, {MinNumFields} or {MaxNumFields} fields on each line");
                 }
 
             }

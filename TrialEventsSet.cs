@@ -6,7 +6,8 @@ namespace PPOSimulator
 {
     public class TrialEventSet
     {
-        private const int NumFields = 3; // code, person, price
+        private const int MinNumFields = 2; // code, person
+        private const int MaxNumFields = 3; // code, person, price
 
         public string TrialEventsCsvPath { get; }
         public List<TrialEvent> TrialEvents { get; }
@@ -30,16 +31,16 @@ namespace PPOSimulator
                 var fields = line.Split(delims, StringSplitOptions.RemoveEmptyEntries);
                 if (fields.Length > 0)
                 {
-                    if (fields.Length != NumFields)
+                    if (fields.Length < MinNumFields || fields.Length > MaxNumFields)
                     {
                         throw new ApplicationException(
-                            $"Line {lineNumber} of {trialEventsCsvPath} has {fields.Length} fields, must be {NumFields} fields on each line");
+                            $"Line {lineNumber} of {trialEventsCsvPath} has {fields.Length} fields, must be {MinNumFields} to {MaxNumFields} fields on each line");
                     }
 
                     int i = 0;
-                    string code = fields[i++].ToUpper();
-                    string person = fields[i++].ToLower();
-                    string serviceCostStr = fields[i++];
+                    string code = fields[i++].ToUpper().Trim();
+                    string person = fields[i++].ToLower().Trim();
+                    string serviceCostStr = (fields.Length == MaxNumFields) ? fields[i++].Trim() : "";
 
                     if (!people.Names.Contains(person))
                     {

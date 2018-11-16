@@ -76,6 +76,18 @@ namespace PPOSimulator
 
         public void Run()
         {
+            // Write header
+            Console.Write("Code,Description,Service Cost");
+
+            foreach (var simStatus in SimStatusPerPlan)
+            {
+                var plan = simStatus.PlanFeatures.NameOfPlan;
+                Console.Write($",{plan} Copay,{plan} Deductible Paid YTD,{plan} Out of Pocket YTD");
+            }
+
+            Console.WriteLine();
+
+            bool firstPlan = true;
             foreach (var trialEvent in TrialEvents.TrialEvents)
             {
                 var code = trialEvent.Code;
@@ -87,20 +99,29 @@ namespace PPOSimulator
                         throw new ApplicationException($"Invalid code '{code}': {_trialEventsCsvPath} uses code '{code}' which is not in {simStatus.PlanFeatures.PlanFeaturesCsvPath}");
                     }
 
-                    var expenseFeatures = simStatus.PlanFeatures.ExpenseFeaturesDict[code];
-                    int cost = expenseFeatures.DefaultServiceCostDollars;
-                    if (trialEvent.ServiceCostDollars.HasValue)
+                    int serviceCost;
+                    simStatus.SimulateEvent(trialEvent, out serviceCost); // TODO: this should return SimResultRowOnePlan
+
+                    if (firstPlan)
                     {
-                        cost = trialEvent.ServiceCostDollars.Value;
+                        firstPlan = false;
+
+                        var desc = simStatus.PlanFeatures.ExpenseFeaturesDict[code];
+                        Console.Write($"{code},{desc},{serviceCost}");
                     }
 
-                    float copayOrCoinsuranceDollars = (float)(expenseFeatures.IsCopay
-                        ? expenseFeatures.CopayDollars
-                        : cost * expenseFeatures.CoinsurancePercent / 100f);
-
-                    simStatus.SimulateEvent(trialEvent, expenseFeatures.IsCopay, cost, copayOrCoinsuranceDollars);
+                    // TODO: fix this and rest of calculations
+                    int copay = 0;
+                    int deductiblePaidYtd = 0;
+                    int outOfPocketPaidYtd = 0;
+                    Console.Write($",{copay},{deductiblePaidYtd},{outOfPocketPaidYtd}");
                 }
+                Console.WriteLine();
             }
+
+            Console.WriteLine();
+            Console.WriteLine("Press any key to exit: ");
+            Console.ReadKey();
         }
     }
 }
